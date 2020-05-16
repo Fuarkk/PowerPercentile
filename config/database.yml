@@ -1,0 +1,20 @@
+default: &default
+  adapter: postgresql
+  endcoding: utf8
+  pool: 5
+  username: postgres
+  password: password
+
+development:
+  <<: *default
+  host: <%= ENV["DB_HOST"] %>
+  database: PowerPercentile_dev
+
+test: &test
+  <<: *default
+  host: <%= ENV["DB_HOST"] %>
+  database: PowerPercentile_test
+
+production:
+  <<: *default
+  database: PowerPercentile_prod
