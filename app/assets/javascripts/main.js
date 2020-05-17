@@ -54,12 +54,14 @@ function drawLine(data, name, sx, sy, colour){
 
   sortedData = middleSort(data);
 
-  console.log(100/3);
+  minValue = 0;
+  maxValue = sortedData.length-1;
 
-  mult = (100 + (data.length+1/ 100)) / data.length+1;
+  console.log(minValue);
+
 
   var lineFunction = d3.line()
-    .x(function(d, i) { return sx(mult*i) })
+    .x(function(d, i) { return sx(100*((i - minValue) / (maxValue - minValue))) })
     .y(function(d) { return sy(d); })
     .curve(d3.curveCatmullRom);
 
