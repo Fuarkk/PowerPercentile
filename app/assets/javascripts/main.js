@@ -2,19 +2,28 @@ function drawChart(){
 
   displayContext = d3.select(".displayContext");
 
-  var lineData = [ { "x": 1,   "y": 5},  { "x": 20,  "y": 20},
-                   { "x": 40,  "y": 10}, { "x": 60,  "y": 40},
-                   { "x": 80,  "y": 45},  { "x": 100, "y": 60},
-                   { "x": 120,   "y": 85},  { "x": 140,  "y": 20},
-                   { "x": 160,  "y": 102}, { "x": 180,  "y": 40},
-                   { "x": 200,  "y": 542},  { "x": 220, "y": 60},
-                   { "x": 240,   "y": 52},  { "x": 260,  "y": 20},
-                   { "x": 280,  "y": 104}, { "x": 330,  "y": 40}];
+  dashWidth  = 1400;
+  dashHeight = 600;
+
+  var lineData = [ { "x": 0,   "y":  0},  { "x": 10,  "y": 10},
+                   { "x": 20,  "y": 20},  { "x": 30,  "y": 30},
+                   { "x": 40,  "y": 60},  { "x": 50, "y": 50},
+                   { "x": 60,  "y": 140},  { "x": 70, "y": 30},
+                   { "x": 80,  "y": 20}, { "x": 90, "y": 10},
+                   { "x": 100, "y": 0}];
+
+   var scaleX = d3.scaleLinear()
+                 .domain([0, 100])
+                 .range([40, dashWidth]);
+
+   var scaleY = d3.scaleLinear()
+                 .domain([140, 0])
+                 .range([40, dashHeight - 40]);
 
    var lineFunction = d3.line()
-     .x(function(d) { return d.x; })
-     .y(function(d) { return d.y; })
-     .curve(d3.curveLinear);
+     .x(function(d) { return scaleX(d.x); })
+     .y(function(d) { return scaleY(d.y); })
+     .curve(d3.curveCatmullRom);
 
     var lineGraph = displayContext.append("path")
     .attr("d", lineFunction(lineData))
@@ -22,4 +31,18 @@ function drawChart(){
     .attr("stroke-width", 2)
     .attr("fill", "none");
 
+    // Add scales to axis
+    var x_axis = d3.axisBottom()
+                   .scale(scaleX);
+
+    var y_axis = d3.axisRight()
+                  .scale(scaleY);
+
+    displayContext.append("g")
+      .attr("transform", "translate(0," + (dashHeight - 40) + ")")
+      .call(x_axis);
+
+    displayContext.append("g")
+      .attr("transform", "translate(" + 40 +  ",0)")
+      .call(y_axis);
 }
