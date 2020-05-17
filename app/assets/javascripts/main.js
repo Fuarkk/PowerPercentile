@@ -5,6 +5,12 @@ function drawChart(){
   dashWidth  = 1400;
   dashHeight = 600;
 
+
+  var squatData    = [ 201, 172, 342, 120, 193, 141, 152];
+  var benchData    = [ 100, 42,  63,  104, 123, 111,  90];
+  var deadliftData = [ 300, 285, 140, 120, 190, 145,  95];
+
+
   var lineData = [ { "x": 0,   "y":  0},  { "x": 10,  "y": 10},
                    { "x": 20,  "y": 20},  { "x": 30,  "y": 30},
                    { "x": 40,  "y": 60},  { "x": 50, "y": 50},
