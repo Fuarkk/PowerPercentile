@@ -26,27 +26,36 @@
   height: 75px;
 }
 
-.dashboard {
-  margin-top: 30px;
-  width: 50%;
+.inputForm {
+  margin-top: 20px;
+  margin-right: 20px;
+
+  width: calc(30%);
   height: 600px;
-  border: solid black;
-  border-radius: 5px;
+
+  border: solid black 2px;
+
+  -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+
 }
 
 .displayContext {
   margin: 20px;
-  width: calc(50% - 40px);
+  width: calc(70%);
   height: 600px;
 
-  border: solid black;
-  border-radius: 5px;
+  border: solid black 2px;
+
+  -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+
 }
 
-.dashboardRect {
-  width: 100%;
-  height: 100%;
-  fill: white;
+.flex-container {
+  display: flex;
 }
 
 
@@ -101,4 +110,12 @@ background-color: #1b95e0 !important;
 
 i{
    color:#fffff !important;
+}
+
+
+
+
+.submitBtn {
+  margin-top: 20px;
+  width: 100%
 }
