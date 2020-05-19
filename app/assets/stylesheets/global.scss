@@ -35,10 +35,7 @@
 
   border: solid black 2px;
 
-  -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-  -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
   box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-
 }
 
 .displayContext {
@@ -48,16 +45,12 @@
 
   border: solid black 2px;
 
-  -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-  -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
   box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-
 }
 
 .flex-container {
   display: flex;
 }
-
 
 .instaBlock {
   text-shadow: 2px 2px 4px #def, 0 0 0 #000, 1px 2px 2px #def;
@@ -90,32 +83,29 @@
 
 
 .ft14 {
-font-size: 55px !important;
+  font-size: 55px !important;
   color:black;
-
 }
-
-
-.ft60 {
-font-size: 60px !important;
-  }
-.clr-blue{color:blue;}
-.clr-prl{color:purple;}
-.bg-bl.clr-prl{color:purple;}
-
-.bg-blue{
-background-color: #1b95e0 !important;
-  color:#fffff;
-}
-
-i{
-   color:#fffff !important;
-}
-
-
 
 
 .submitBtn {
-  margin-top: 20px;
-  width: 100%
+
+  position: relative;
+  left: 10%;
+  top: 399px;
+  font-size: 25px;
+  font-family: 'Montserrat', sans-serif;
+  height: 50px;
+
+  width: 80%;
+  border-radius: 5px;
+  border: solid #7acfcd 1px;
+  background: #7acfcd;
+  color: white;
+
+  box-shadow: inset -5px -5px 5px 0px rgba(0,0,0,0.22);
+
+  &:hover{
+    background: #3aa5ba;
+  }
 }

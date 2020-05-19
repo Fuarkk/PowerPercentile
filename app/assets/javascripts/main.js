@@ -2,19 +2,12 @@ function drawChart(){
 
   displayContext = d3.select(".displayContext");
 
-  dashWidth  = 1400;
+  dashWidth  = 1100;
   dashHeight = 600;
 
   var squatData    = [ 201, 172, 342, 120, 193, 141, 152];
   var benchData    = [ 100, 42,  63,  104, 123, 111,  90];
   var deadliftData = [ 300, 285, 140, 120, 190, 145,  95];
-
-  var lineData = [ { "x": 0,   "y":  0},  { "x": 10,  "y": 10},
-                   { "x": 20,  "y": 20},  { "x": 30,  "y": 30},
-                   { "x": 40,  "y": 60},  { "x": 50, "y": 50},
-                   { "x": 60,  "y": 140},  { "x": 70, "y": 30},
-                   { "x": 80,  "y": 20}, { "x": 90, "y": 10},
-                   { "x": 100, "y": 0}];
 
    var scaleX = d3.scaleLinear()
                  .domain([0, 100])
@@ -58,7 +51,6 @@ function drawLine(data, name, sx, sy, colour){
   maxValue = sortedData.length-1;
 
   console.log(minValue);
-
 
   var lineFunction = d3.line()
     .x(function(d, i) { return sx(100*((i - minValue) / (maxValue - minValue))) })
