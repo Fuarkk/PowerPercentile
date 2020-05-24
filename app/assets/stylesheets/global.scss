@@ -81,18 +81,16 @@
   }
 }
 
-
 .ft14 {
   font-size: 55px !important;
   color:black;
 }
 
-
 .submitBtn {
 
   position: relative;
   left: 10%;
-  top: 399px;
+  top: 150px;
   font-size: 25px;
   font-family: 'Montserrat', sans-serif;
   height: 50px;
@@ -107,5 +105,36 @@
 
   &:hover{
     background: #3aa5ba;
+  }
+}
+
+
+/* Tooltip container */
+.p_tooltip {
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.p_tooltip .p_tooltip_text {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+
+  &:hover{
+    visibility: visible;
+  }
+}
+
+.p_tooltip:hover{
+  .p_tooltip_text{
+    visibility: visible;
   }
 }
