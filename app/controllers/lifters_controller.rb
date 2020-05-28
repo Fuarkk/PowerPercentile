@@ -1,0 +1,2 @@
+class LiftersController < ApplicationController
+end

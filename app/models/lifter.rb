@@ -1,0 +1,2 @@
+class Lifter < ApplicationRecord
+end
