@@ -1,6 +1,6 @@
 require 'csv'
 
-CSV.foreach('OPLData/DATAFINAL.csv', headers: true) do |row|
+CSV.foreach('OPLData/uniqueraws.csv', headers: false) do |row|
 
   tested = row[13] == "Yes" ? true : false;
 
