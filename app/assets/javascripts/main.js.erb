@@ -1,20 +1,29 @@
-function drawChart(){
+function drawChart(data){
+
+  // total = squat + bench + deadlift;
 
   displayContext = d3.select(".displayContext");
+
+  content = displayContext
+  // Responsive SVG needs these 2 attributes and no width and height attr.
+  .attr("preserveAspectRatio", "xMinYMin meet")
+  .attr("viewBox", "0 0 1200 600")
+  // Class to make it responsive.
+  .classed("svg-content-responsive", true)
+  // Fill with a rectangle for visualization.
+
 
   dashWidth  = 1100;
   dashHeight = 600;
 
-  var squatData    = [ 201, 172, 342, 120, 193, 141, 152];
-  var benchData    = [ 100, 42,  63,  104, 123, 111,  90];
-  var deadliftData = [ 300, 285, 140, 120, 190, 145,  95];
+  maxTotal = data[3][data[3].length - 1];
 
    var scaleX = d3.scaleLinear()
                  .domain([0, 100])
                  .range([40, dashWidth]);
 
    var scaleY = d3.scaleLinear()
-                 .domain([350, 0])
+                 .domain([maxTotal, 0])
                  .range([40, dashHeight - 40]);
 
 
@@ -24,20 +33,18 @@ function drawChart(){
    var y_axis = d3.axisRight()
                  .scale(scaleY);
 
-   drawLine(squatData, "squat", scaleX, scaleY, "blue");
-   drawLine(benchData, "squat", scaleX, scaleY, "green");
-   drawLine(deadliftData, "squat", scaleX, scaleY, "purple");
+
+   drawLine(data[0], "squat", scaleX, scaleY, "green");
+   drawLine(data[1], "bench", scaleX, scaleY, "red");
+   drawLine(data[2], "deadlift", scaleX, scaleY, "blue");
+   drawLine(data[3], "total", scaleX, scaleY, "black");
 
 
-
-    // Add scales to axis
-
-
-    displayContext.append("g")
+    content.append("g")
       .attr("transform", "translate(0," + (dashHeight - 40) + ")")
       .call(x_axis);
 
-    displayContext.append("g")
+    content.append("g")
       .attr("transform", "translate(" + 40 +  ",0)")
       .call(y_axis);
 }
@@ -45,7 +52,7 @@ function drawChart(){
 
 function drawLine(data, name, sx, sy, colour){
 
-  sortedData = middleSort(data);
+  sortedData = data;
 
   minValue = 0;
   maxValue = sortedData.length-1;
@@ -55,13 +62,17 @@ function drawLine(data, name, sx, sy, colour){
   var lineFunction = d3.line()
     .x(function(d, i) { return sx(100*((i - minValue) / (maxValue - minValue))) })
     .y(function(d) { return sy(d); })
-    .curve(d3.curveCatmullRom);
+    .curve(d3.curveBasis);
 
-    var lineGraph = displayContext.append("path")
+    var lineGraph = content.append("path")
     .attr("d", lineFunction(sortedData))
+    .transition()
+    .ease(d3.easeSin)
+    .duration(2500)
     .attr("stroke", colour)
     .attr("stroke-width", 2)
-    .attr("fill", "none");
+    .attr("fill", "none")
+    .attr("shape-rendering", "geometricPrecision");
 }
 
 function middleSort(data){

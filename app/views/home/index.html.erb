@@ -3,59 +3,53 @@
     <svg class="displayContext">
     </svg>
 
-    <div class="inputForm">
-      <form>
-        <div class="row" style="padding: 25px; padding-bottom: 10px;">
-          <div class="col-sm-4">
-            <label> Squat </label>
-            <input type="number" class="form-control input-md">
-          </div>
+    <%= form_with url: submit_data_path, class: "inputForm", method: :get, remote: true do |form| %>
+      <div class="row" style="padding: 25px; padding-bottom: 10px;">
+        <div class="col-sm-4">
+          <label> Squat </label>
+          <%= form.number_field :squat, class: "form-control input-md" %>
+        </div>
 
-          <div class="col-sm-4">
-            <label> Bench </label>
-            <input type="number" class="form-control input-md">
-          </div>
+        <div class="col-sm-4">
+          <label> Bench </label>
+          <%= form.number_field :bench, class: "form-control input-md" %>
+        </div>
 
-          <div class="col-sm-4">
-            <label> Deadlift </label>
-            <input type="number" class="form-control input-md">
-          </div>
+        <div class="col-sm-4">
+          <label> Deadlift </label>
+          <%= form.number_field :deadlift, class: "form-control input-md" %>
         </div>
-        <div class="row" style="padding: 25px; padding-bottom: 10px;">
-          <div class="col-sm-12">
-            <label class="p_tooltip">
-                Age ⓘ
-              <span class="p_tooltip_text">
-                Age on January 1st
-              </span>
-            </label>
-            <input type="number" class="form-control input-md" title="testing">
-          </div>
+      </div>
+      <div class="row" style="padding: 25px; padding-bottom: 10px;">
+        <div class="col-sm-12">
+          <label class="p_tooltip">
+              Age ⓘ
+            <span class="p_tooltip_text">
+              Age on January 1st
+            </span>
+          </label>
+          <%= form.number_field :age, class: "form-control input-md" %>
         </div>
-        <div class="row" style="padding: 25px; padding-bottom: 10px;">
-          <div class="col-sm-12">
-            <label> Gender </label>
-            <select id="genderSelect" class="form-control">
-              <option value="male"> Male   </option>
-              <option value="female"> Female </option>
-            </select>
-          </div>
+      </div>
+      <div class="row" style="padding: 25px; padding-bottom: 10px;">
+        <div class="col-sm-12">
+          <label> Gender </label>
+          <%= form.select(:gender, ["Male", "Female"], {}, {id:"genderSelect", class:"form-control"}) %>
         </div>
-        <div class="row" style="padding: 25px; padding-bottom: 10px;">
-          <div class="col-sm-12">
-            <label> Weight Class </label>
-            <select id="weightSelect" class="form-control">
-            </select>
-          </div>
+      </div>
+      <div class="row" style="padding: 25px; padding-bottom: 10px;">
+        <div class="col-sm-12">
+          <label> Weight Class </label>
+          <%= form.select(:weightClass, [], {}, {id:"weightClassField", class:"form-control"}) %>
         </div>
-        <button type="submit" class="submitBtn">Submit</button>
-      </form>
-    </div>
+      </div>
+
+        <%= form.submit "Submit", class:"submitBtn" %>
+    <% end %>
   </div>
 </body>
 
 <script>
-  drawChart();
 </script>
 
 <script>
@@ -65,9 +59,14 @@
   feWeights=["43", "47", "52", "57", "63", "72", "84", "84+"];
 
   genderSelect = document.getElementById("genderSelect");
-  weightSelect = document.getElementById("weightSelect");
+  weightSelect = document.getElementById("weightClassField");
 
   setWeights(maWeights);
+  setGender("Male");
+
+  function setGender(gender){
+    genderSelect.value = gender;
+  }
 
   function setWeights(weightArr){
     $(weightSelect).empty();

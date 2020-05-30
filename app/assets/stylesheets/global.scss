@@ -41,7 +41,6 @@
 .displayContext {
   margin: 20px;
   width: calc(70%);
-  height: 600px;
 
   border: solid black 2px;
 
@@ -137,4 +136,23 @@
   .p_tooltip_text{
     visibility: visible;
   }
+}
+
+
+
+
+.svg-container {
+  display: inline-block;
+  vertical-align: top;
+  overflow: hidden;
+}
+.svg-content-responsive {
+  display: inline-block;
+  left: 0;
+}
+
+svg .rect {
+  fill: gold;
+  stroke: steelblue;
+  stroke-width: 5px;
 }
