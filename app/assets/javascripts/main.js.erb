@@ -1,62 +1,67 @@
 function drawChart(data, user_stats){
 
-  resetGraph();
-
-  nameArr = ["squat", "bench", "deadlift", "total"];
-
-  squatArr    = data[0];
-  benchArr    = data[1];
-  deadliftArr = data[2];
-  totalArr    = data[3];
-
-  squat    = user_data[0];
-  bench    = user_data[1];
-  deadlift = user_data[2];
-  total = squat + bench + deadlift;
-
-  closestSquat    = closest(squatArr,    squat);
-  closestBench    = closest(benchArr,    bench);
-  closestDeadlift = closest(deadliftArr, deadlift);
-  closestTotal    = closest(totalArr,    total);
-
-  maxTotal = data[3][data[3].length - 1];
-  dashWidth  = 1150;
-  dashHeight = 700;
-
+  // Clearing the context every time submit is clicked, optimisation possible here.
+  d3.select(".displayContext").html("");
 
   var displayContext = d3.select(".displayContext");
 
+  const NAMES = {
+    s: "squat",
+    b: "bench",
+    d: "dead",
+    t: "total"
+  };
+
+  const LIFTS = {
+    s: user_data[0],
+    b: user_data[1],
+    d: user_data[2],
+    t: user_data[0] +
+       user_data[1] +
+       user_data[2]
+  };
+
+  const DATA = {
+    s: data[0],
+    b: data[1],
+    d: data[2],
+    t: data[3]
+  };
+
+  const DIMENSIONS = {
+    dw: 1150,
+    dh: 700,
+    margin: 40
+  };
+
+  const maxTotal = DATA.t[DATA.t.length - 1];
+
+  var content = displayContext
+  .classed("svg-content-responsive", true)
+  .attr("id",                  "content")
+  .attr("preserveAspectRatio", "xMinYMin meet")
+  .attr("viewBox",             "0 0 " + DIMENSIONS.dw + " " + DIMENSIONS.dh)
+
   var scaleX = d3.scaleLinear()
                  .domain([0, 100])
-                 .range([40, dashWidth - 40]);
+                 .range([DIMENSIONS.margin,
+                         DIMENSIONS.dw - DIMENSIONS.margin]);
 
   var scaleY = d3.scaleLinear()
                  .domain([maxTotal + 50, 0])
-                 .range([40, dashHeight - 40]);
-
-
-  var content = displayContext
-  .attr("id", "content")
-  .attr("preserveAspectRatio", "xMinYMin meet")
-  .attr("viewBox", "0 0 1200 700")
-  .classed("svg-content-responsive", true)
-
-  var x_axis = d3.axisBottom()
-                 .scale(scaleX);
-
-  var y_axis = d3.axisRight()
-               .scale(scaleY);
+                 .range([DIMENSIONS.margin,
+                         DIMENSIONS.dh - DIMENSIONS.margin]);
 
   var clip = content.append("defs").append("svg:clipPath")
   .attr("id", "clip")
   .append("svg:rect")
-  .attr("width", dashWidth )
-  .attr("height", dashHeight )
+  .attr("width",  DIMENSIONS.dw)
+  .attr("height", DIMENSIONS.dh)
   .attr("x", 0)
   .attr("y", 0);
 
   var brush = d3.brushX()
-  .extent( [ [40,40], [dashWidth,dashHeight-40] ] )
+  .extent([[DIMENSIONS.margin, DIMENSIONS.margin], [DIMENSIONS.dw,DIMENSIONS.dh - DIMENSIONS.margin]])
   .on("end", updateChart)
 
   var paths = content.append("g")
@@ -64,51 +69,53 @@ function drawChart(data, user_stats){
                      .attr("clip-path", "url(#clip)")
                      .on('mouseover', mouseover)
                      .on('mousemove', mousemove)
-                     .on('mouseout', mouseout);
+                     .on('mouseout',  mouseout);
 
-  x_axis = content.append("g")
-      .attr("transform", "translate(0," + (dashHeight - 40) + ")")
+  x_axis = content
+    .append("g")
+      .attr("transform", "translate(0," + (DIMENSIONS.dh - DIMENSIONS.margin) + ")")
       .attr("id", "xAxis")
       .call(d3.axisBottom(scaleX));
 
-  content.append("text")
-     .attr("y", dashHeight )
-     .attr("x", dashWidth / 2)
+  xAxisText = content.append("text")
+     .attr("y", DIMENSIONS.dh)
+     .attr("x", DIMENSIONS.dw / 2)
      .style("text-anchor", "middle")
      .text("Percentile Rank");
 
-  y_axis = content.append("g")
-      .attr("transform", "translate(" + (dashWidth - 40) +  ",0)")
-      .attr("id", "yAxis")
-      .call(d3.axisRight(scaleY));
+  y_axis = content
+   .append("g")
+     .attr("transform", "translate(" + (DIMENSIONS.dw - DIMENSIONS.margin) + ",0)")
+     .attr("id", "yAxis")
+     .call(d3.axisRight(scaleY));
 
-  content.append("text")
-    .attr("y", dashWidth + 10)
-    .attr("x",  - dashHeight / 2)
-    .attr("transform", "rotate(-90)")
-    .style("text-anchor", "middle")
-    .text("Kg Lifted");
+  yAxisText = content
+    .append("text")
+      .text("Kg Lifted")
+      .attr("y",   DIMENSIONS.dw + 10)
+      .attr("x", - DIMENSIONS.dh / 2)
+      .attr("transform",    "rotate(-90)")
+      .style("text-anchor", "middle");
 
+  //Container for the gradients
+  var defs = content.append("defs");
 
-    //Container for the gradients
-    var defs = content.append("defs");
+  //Filter for the outside glow
+  var filter = defs.append("filter")
+      .attr("id","glow");
+  filter.append("feGaussianBlur")
+      .attr("stdDeviation","2.5")
+      .attr("result","coloredBlur");
+  var feMerge = filter.append("feMerge");
+  feMerge.append("feMergeNode")
+      .attr("in","coloredBlur");
+  feMerge.append("feMergeNode")
+      .attr("in","SourceGraphic");
 
-    //Filter for the outside glow
-    var filter = defs.append("filter")
-        .attr("id","glow");
-    filter.append("feGaussianBlur")
-        .attr("stdDeviation","2.5")
-        .attr("result","coloredBlur");
-    var feMerge = filter.append("feMerge");
-    feMerge.append("feMergeNode")
-        .attr("in","coloredBlur");
-    feMerge.append("feMergeNode")
-        .attr("in","SourceGraphic");
+  drawLines(scaleX, scaleY, DATA, NAMES);
 
-    drawLines(scaleX, scaleY);
-
-    d3.selectAll("path")
-        .style("filter", "url(#glow)");
+  d3.selectAll("path")
+      .style("filter", "url(#glow)");
 
   paths.append("g")
        .attr("class", "brush")
@@ -120,20 +127,20 @@ function drawChart(data, user_stats){
     //super ugly code, tidy later
     d3.select("#squatCircle").style("opacity",1);
     d3.select("#benchCircle").style("opacity",1);
-    d3.select("#deadliftCircle").style("opacity",1);
+    d3.select("#deadCircle").style("opacity",1);
     d3.select("#totalCircle").style("opacity",1);
 
     d3.select("#squatText").style("opacity",1);
     d3.select("#benchText").style("opacity",1);
-    d3.select("#deadliftText").style("opacity",1);
+    d3.select("#deadText").style("opacity",1);
     d3.select("#totalText").style("opacity",1);
   }
 
   function genCirclesAndText(){
-    circleAndText("squat", "blue")
-    circleAndText("bench", "red")
-    circleAndText("deadlift", "green")
-    circleAndText("total", "black")
+    circleAndText(NAMES.s, "blue")
+    circleAndText(NAMES.b, "red")
+    circleAndText(NAMES.d, "green")
+    circleAndText(NAMES.t, "black")
   }
 
   function circleAndText(name, colour){
@@ -176,33 +183,33 @@ function drawChart(data, user_stats){
     var x0 = scaleX.invert(d3.mouse(this)[0]);
 
     // text position doesn't need to be updated all the time, fix l8r
-    circleUpdate(squatArr, "squat", 50, 50, x0);
-    circleUpdate(benchArr, "bench", 50, 80, x0);
-    circleUpdate(deadliftArr, "deadlift", 50, 110, x0);
-    circleUpdate(totalArr, "total", 50, 140, x0);
+    circleUpdate(DATA.s, "squat", 50, 50,  x0);
+    circleUpdate(DATA.b, "bench", 50, 80,  x0);
+    circleUpdate(DATA.d, "dead",  50, 110, x0);
+    circleUpdate(DATA.t, "total", 50, 140, x0);
   }
 
   function mouseout() {
     //super ugly code, tidy later
     d3.select("#squatText").style("opacity",1);
     d3.select("#benchText").style("opacity",1);
-    d3.select("#deadliftText").style("opacity",1);
+    d3.select("#deadText").style("opacity",1);
     d3.select("#totalText").style("opacity",1);
 
     d3.select("#squatText").style("opacity",0);
     d3.select("#benchText").style("opacity",0);
-    d3.select("#deadliftText").style("opacity",0);
+    d3.select("#deadText").style("opacity",0);
     d3.select("#totalText").style("opacity",0);
   }
 
-  userLiftsPoints("squat", squatArr, squat);
-  userLiftsPoints("bench", benchArr, bench);
-  userLiftsPoints("deadlift", deadliftArr, deadlift);
-  userLiftsPoints("total", totalArr, total);
+  userLiftsPoints(NAMES.s, DATA.s, LIFTS.s);
+  userLiftsPoints(NAMES.b, DATA.b, LIFTS.b);
+  userLiftsPoints(NAMES.d, DATA.d, LIFTS.d);
+  userLiftsPoints(NAMES.t, DATA.t, LIFTS.t);
 
-  function userLiftsPoints(name, arr, lift){
+  function userLiftsPoints(name, a, lift){
 
-    var i = d3.bisect(arr, parseInt(lift), 1);
+    var i = d3.bisect(a, parseInt(lift), 1);
 
     content
      .append('g')
@@ -213,10 +220,9 @@ function drawChart(data, user_stats){
      .attr("stroke-width", 1.5)
      .attr('r', 5.5)
      .style("opacity", 1)
-     .attr("cx", scaleX(100*((i) / (arr.length-1))))
+     .attr("cx", scaleX(100*((i) / (a.length-1))))
      .attr("cy", scaleY(lift));
   }
-
 
   var idleTimeout;
 
@@ -228,26 +234,26 @@ function drawChart(data, user_stats){
       extent = d3.event.selection
 
       if(!extent){
-        if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+        if (!idleTimeout) return idleTimeout = setTimeout(idled, 350);
         scaleX.domain([0,100])
       }else{
         scaleX.domain([scaleX.invert(extent[0]), scaleX.invert(extent[1])])
-        paths.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+        paths.select(".brush").call(brush.move, null)
       }
 
       x_axis.transition().duration(1000).call(d3.axisBottom(scaleX))
 
-      updateLine(squatArr,    "#squat",    scaleX, scaleY);
-      updatePoint(squatArr,    "#squat",    scaleX, scaleY, squat);
+      updateLine( DATA.s, NAMES.s, scaleX, scaleY);
+      updatePoint(DATA.s, NAMES.s, scaleX, scaleY, LIFTS.s);
 
-      updateLine(benchArr,    "#bench",    scaleX, scaleY);
-      updatePoint(benchArr,    "#bench",    scaleX, scaleY, bench);
+      updateLine( DATA.b, NAMES.b, scaleX, scaleY);
+      updatePoint(DATA.b, NAMES.b, scaleX, scaleY, LIFTS.b);
 
-      updateLine(deadliftArr, "#deadlift", scaleX, scaleY);
-      updatePoint(deadliftArr,    "#deadlift",    scaleX, scaleY, deadlift);
+      updateLine( DATA.d, NAMES.d, scaleX, scaleY);
+      updatePoint(DATA.d, NAMES.d, scaleX, scaleY, LIFTS.d);
 
-      updateLine(totalArr,    "#total",    scaleX, scaleY);
-      updatePoint(totalArr,    "#total",    scaleX, scaleY, total);
+      updateLine( DATA.t, NAMES.t, scaleX, scaleY);
+      updatePoint(DATA.t, NAMES.t, scaleX, scaleY, LIFTS.t);
     }
 }
 
@@ -255,46 +261,32 @@ function updatePoint(arr, name, x, y, lift){
 
   var i = d3.bisect(arr, parseInt(lift), 1);
 
-  d3.select(name + "Lift")
+  d3.select("#" + name + "Lift")
   .attr("cx", x(100*((i) / (arr.length-1))))
   .attr("cy", y(lift));
 }
 
 function updateLine(arr, name, x, y){
-  data = arr;
-  maxValue = data.length - 1;
+  maxValue = arr.length - 1;
 
   var lineFunction = d3.line()
     .x(function(d, i) { return x(100*((i) / (maxValue))) })
     .y(function(d) { return y(d); });
 
-  d3.select(name).attr("d", lineFunction(data))
+  d3.select("#" + name).attr("d", lineFunction(arr))
 }
 
-function drawLines(x, y){
-  drawLine(squatArr,    "squat",    x, y, "blue");
-  drawLine(benchArr,    "bench",    x, y, "red");
-  drawLine(deadliftArr, "deadlift", x, y, "green");
-  drawLine(totalArr,    "total",    x, y, "black");
-}
-
-function resetGraph(){
-  d3.select(".displayContext").html("");
-}
-
-
-function closest(arr, goal){
-  return arr.reduce(function(prev, curr) {
-    return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
-  });
+function drawLines(x, y, DATA, NAMES){
+  drawLine(DATA.s, NAMES.s, x, y, "blue");
+  drawLine(DATA.b, NAMES.b, x, y, "red");
+  drawLine(DATA.d, NAMES.d, x, y, "green");
+  drawLine(DATA.t, NAMES.t, x, y, "black");
 }
 
 function drawLine(data, name, sx, sy, colour){
 
-  maxValue = data.length-1;
-
   var lineFunction = d3.line()
-    .x(function(d, i) { return sx(100*(i / maxValue)) })
+    .x(function(d, i) { return sx(100*(i / (data.length-1))) })
     .y(function(d) { return sy(d); });
 
     d3.select("#paths").append("path")
