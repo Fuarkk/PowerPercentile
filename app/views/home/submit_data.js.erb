@@ -1,7 +1,8 @@
-
 var data = '<%= @data %>';
-
+var user_data = '<%= @user_stats %>';
 
 data = JSON.parse(data);
 
-drawChart(data);
+user_data = JSON.parse(user_data);
+
+drawChart(data, user_data);

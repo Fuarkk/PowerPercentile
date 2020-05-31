@@ -7,17 +7,17 @@
       <div class="row" style="padding: 25px; padding-bottom: 10px;">
         <div class="col-sm-4">
           <label> Squat </label>
-          <%= form.number_field :squat, class: "form-control input-md" %>
+          <%= form.number_field :squat, class: "form-control input-md", required: true %>
         </div>
 
         <div class="col-sm-4">
           <label> Bench </label>
-          <%= form.number_field :bench, class: "form-control input-md" %>
+          <%= form.number_field :bench, class: "form-control input-md", required: true %>
         </div>
 
         <div class="col-sm-4">
           <label> Deadlift </label>
-          <%= form.number_field :deadlift, class: "form-control input-md" %>
+          <%= form.number_field :deadlift, class: "form-control input-md", required: true %>
         </div>
       </div>
       <div class="row" style="padding: 25px; padding-bottom: 10px;">
@@ -28,7 +28,7 @@
               Age on January 1st
             </span>
           </label>
-          <%= form.number_field :age, class: "form-control input-md" %>
+          <%= form.number_field :age, class: "form-control input-md", required: true %>
         </div>
       </div>
       <div class="row" style="padding: 25px; padding-bottom: 10px;">
@@ -43,18 +43,13 @@
           <%= form.select(:weightClass, [], {}, {id:"weightClassField", class:"form-control"}) %>
         </div>
       </div>
-
-        <%= form.submit "Submit", class:"submitBtn" %>
+      <%= form.submit "Submit", class:"submitBtn" %>
     <% end %>
   </div>
 </body>
 
 <script>
-</script>
 
-<script>
-
-  //male/female weight classes
   maWeights=["53", "59", "66", "74", "83", "93", "105", "120", "120+"];
   feWeights=["43", "47", "52", "57", "63", "72", "84", "84+"];
 
@@ -80,28 +75,8 @@
     })
   }
 
-  const capitalize = (s) => {
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  }
-
   genderSelect.onchange = function() {
     setWeights(this.selectedIndex == 0 ? maWeights : feWeights);
-  }
-
-  function getGender()   { return capitalize(genderSelect.value); }
-
-  function getSquat()    { return parseInt(squat.value);        }
-  function getBench()    { return parseInt(deadlift.value);     }
-  function getWeight()   { return parseInt(weightSelect.value); }
-  function getDeadlift() { return parseInt(bench.value);        }
-  function getTotal()    { return getSquat() + getBench() + getDeadlift(); }
-
-  const provide = (o, s) => {
-    return !isNaN(o) ? o + "kg" : "Please provide a value for " + s;
-  }
-
-  const provideAlert = (o, s) => {
-    return !isNaN(o) ? null : alert("Please provide a value for " + s);
   }
 
 </script>

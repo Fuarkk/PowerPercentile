@@ -3,21 +3,19 @@ class HomeController < ApplicationController
   end
 
   def submit_data
-    puts params
+    @data = Lifter.where.has{|l| (l.weightClassKg == params[:weightClass].to_i) & (l.age <= params[:age]) & (l.total != nil)}
 
-    @data = Lifter.where.has{|l| (l.weightClassKg == params[:weightClass]) & (l.total != nil)}
-    puts @data.count
+    squatArr    = (@data.where.has{|l| l.squat != nil}).order(squat: :asc).pluck(:squat);
+    benchArr    = (@data.where.has{|l| l.bench != nil}).order(bench: :asc).pluck(:bench);
+    deadliftArr = (@data.where.has{|l| l.deadlift != nil}).order(deadlift: :asc).pluck(:deadlift);
+    totalArr    = (@data.where.has{|l| (l.bench != nil) && (l.squat != nil) && (l.deadlift != nil)}).order(total: :asc).pluck(:total);
 
-    squat    = (@data.where.has{|l| l.squat != nil}).order(squat: :asc).pluck(:squat);
-    bench    = (@data.where.has{|l| l.bench != nil}).order(bench: :asc).pluck(:bench);
-    deadlift = (@data.where.has{|l| l.deadlift != nil}).order(deadlift: :asc).pluck(:deadlift);
-    total    = (@data.where.has{|l| (l.bench != nil) && (l.squat != nil) && (l.deadlift != nil)}).order(total: :asc).pluck(:total);
+    @data = [squatArr, benchArr, deadliftArr, totalArr];
 
-    @data = [squat, bench, deadlift, total];
+    @user_stats = [params[:squat].to_i, params[:bench].to_i, params[:deadlift].to_i].to_json.html_safe;
 
     respond_to do |format|
       format.js
     end
   end
-
 end

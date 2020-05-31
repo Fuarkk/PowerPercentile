@@ -1,88 +1,310 @@
-function drawChart(data){
+function drawChart(data, user_stats){
 
-  // total = squat + bench + deadlift;
+  resetGraph();
 
-  displayContext = d3.select(".displayContext");
+  nameArr = ["squat", "bench", "deadlift", "total"];
 
-  content = displayContext
-  // Responsive SVG needs these 2 attributes and no width and height attr.
-  .attr("preserveAspectRatio", "xMinYMin meet")
-  .attr("viewBox", "0 0 1200 600")
-  // Class to make it responsive.
-  .classed("svg-content-responsive", true)
-  // Fill with a rectangle for visualization.
+  squatArr    = data[0];
+  benchArr    = data[1];
+  deadliftArr = data[2];
+  totalArr    = data[3];
 
+  squat    = user_data[0];
+  bench    = user_data[1];
+  deadlift = user_data[2];
+  total = squat + bench + deadlift;
 
-  dashWidth  = 1100;
-  dashHeight = 600;
+  closestSquat    = closest(squatArr,    squat);
+  closestBench    = closest(benchArr,    bench);
+  closestDeadlift = closest(deadliftArr, deadlift);
+  closestTotal    = closest(totalArr,    total);
 
   maxTotal = data[3][data[3].length - 1];
+  dashWidth  = 1150;
+  dashHeight = 700;
 
-   var scaleX = d3.scaleLinear()
+
+  var displayContext = d3.select(".displayContext");
+
+  var scaleX = d3.scaleLinear()
                  .domain([0, 100])
-                 .range([40, dashWidth]);
+                 .range([40, dashWidth - 40]);
 
-   var scaleY = d3.scaleLinear()
-                 .domain([maxTotal, 0])
+  var scaleY = d3.scaleLinear()
+                 .domain([maxTotal + 50, 0])
                  .range([40, dashHeight - 40]);
 
 
-   var x_axis = d3.axisBottom()
-                  .scale(scaleX);
+  var content = displayContext
+  .attr("id", "content")
+  .attr("preserveAspectRatio", "xMinYMin meet")
+  .attr("viewBox", "0 0 1200 700")
+  .classed("svg-content-responsive", true)
 
-   var y_axis = d3.axisRight()
-                 .scale(scaleY);
+  var x_axis = d3.axisBottom()
+                 .scale(scaleX);
 
+  var y_axis = d3.axisRight()
+               .scale(scaleY);
 
-   drawLine(data[0], "squat", scaleX, scaleY, "green");
-   drawLine(data[1], "bench", scaleX, scaleY, "red");
-   drawLine(data[2], "deadlift", scaleX, scaleY, "blue");
-   drawLine(data[3], "total", scaleX, scaleY, "black");
+  var clip = content.append("defs").append("svg:clipPath")
+  .attr("id", "clip")
+  .append("svg:rect")
+  .attr("width", dashWidth )
+  .attr("height", dashHeight )
+  .attr("x", 0)
+  .attr("y", 0);
 
+  var brush = d3.brushX()
+  .extent( [ [40,40], [dashWidth,dashHeight-40] ] )
+  .on("end", updateChart)
 
-    content.append("g")
+  var paths = content.append("g")
+                     .attr("id", "paths")
+                     .attr("clip-path", "url(#clip)")
+                     .on('mouseover', mouseover)
+                     .on('mousemove', mousemove)
+                     .on('mouseout', mouseout);
+
+  x_axis = content.append("g")
       .attr("transform", "translate(0," + (dashHeight - 40) + ")")
-      .call(x_axis);
+      .attr("id", "xAxis")
+      .call(d3.axisBottom(scaleX));
 
-    content.append("g")
-      .attr("transform", "translate(" + 40 +  ",0)")
-      .call(y_axis);
+  content.append("text")
+     .attr("y", dashHeight )
+     .attr("x", dashWidth / 2)
+     .style("text-anchor", "middle")
+     .text("Percentile Rank");
+
+  y_axis = content.append("g")
+      .attr("transform", "translate(" + (dashWidth - 40) +  ",0)")
+      .attr("id", "yAxis")
+      .call(d3.axisRight(scaleY));
+
+  content.append("text")
+    .attr("y", dashWidth + 10)
+    .attr("x",  - dashHeight / 2)
+    .attr("transform", "rotate(-90)")
+    .style("text-anchor", "middle")
+    .text("Kg Lifted");
+
+
+    //Container for the gradients
+    var defs = content.append("defs");
+
+    //Filter for the outside glow
+    var filter = defs.append("filter")
+        .attr("id","glow");
+    filter.append("feGaussianBlur")
+        .attr("stdDeviation","2.5")
+        .attr("result","coloredBlur");
+    var feMerge = filter.append("feMerge");
+    feMerge.append("feMergeNode")
+        .attr("in","coloredBlur");
+    feMerge.append("feMergeNode")
+        .attr("in","SourceGraphic");
+
+    drawLines(scaleX, scaleY);
+
+    d3.selectAll("path")
+        .style("filter", "url(#glow)");
+
+  paths.append("g")
+       .attr("class", "brush")
+       .call(brush);
+
+  genCirclesAndText();
+
+  function mouseover() {
+    //super ugly code, tidy later
+    d3.select("#squatCircle").style("opacity",1);
+    d3.select("#benchCircle").style("opacity",1);
+    d3.select("#deadliftCircle").style("opacity",1);
+    d3.select("#totalCircle").style("opacity",1);
+
+    d3.select("#squatText").style("opacity",1);
+    d3.select("#benchText").style("opacity",1);
+    d3.select("#deadliftText").style("opacity",1);
+    d3.select("#totalText").style("opacity",1);
+  }
+
+  function genCirclesAndText(){
+    circleAndText("squat", "blue")
+    circleAndText("bench", "red")
+    circleAndText("deadlift", "green")
+    circleAndText("total", "black")
+  }
+
+  function circleAndText(name, colour){
+    content
+     .append('g')
+     .append('circle')
+     .attr("id", name + "Circle")
+     .style("fill", "none")
+     .attr("stroke", colour)
+     .attr("stroke-width", 2.5)
+     .attr('r', 8.5)
+     .style("opacity", 0)
+
+    content
+      .append('g')
+      .append('text')
+      .attr("id", name + "Text")
+      .style("opacity", 0)
+      .attr("text-anchor", "left")
+      .attr("alignment-baseline", "middle")
+      .attr("fill", colour)
+    }
+
+  function circleUpdate(arr, name, x, y, x0){
+    i = (arr.length / 100) * x0;
+
+    var i = d3.bisect(arr, arr[parseInt(i)], 1);
+    selectedData = arr[i];
+
+    d3.select("#" + name + "Circle")
+      .attr("cx", scaleX(x0))
+      .attr("cy", scaleY(selectedData))
+    d3.select("#" + name + "Text")
+      .html(name + ": " + x0.toFixed(2) + "%  -  " + "kg = " + selectedData)
+      .attr("x", x)
+      .attr("y", y)
+  }
+
+  function mousemove() {
+    var x0 = scaleX.invert(d3.mouse(this)[0]);
+
+    // text position doesn't need to be updated all the time, fix l8r
+    circleUpdate(squatArr, "squat", 50, 50, x0);
+    circleUpdate(benchArr, "bench", 50, 80, x0);
+    circleUpdate(deadliftArr, "deadlift", 50, 110, x0);
+    circleUpdate(totalArr, "total", 50, 140, x0);
+  }
+
+  function mouseout() {
+    //super ugly code, tidy later
+    d3.select("#squatText").style("opacity",1);
+    d3.select("#benchText").style("opacity",1);
+    d3.select("#deadliftText").style("opacity",1);
+    d3.select("#totalText").style("opacity",1);
+
+    d3.select("#squatText").style("opacity",0);
+    d3.select("#benchText").style("opacity",0);
+    d3.select("#deadliftText").style("opacity",0);
+    d3.select("#totalText").style("opacity",0);
+  }
+
+  userLiftsPoints("squat", squatArr, squat);
+  userLiftsPoints("bench", benchArr, bench);
+  userLiftsPoints("deadlift", deadliftArr, deadlift);
+  userLiftsPoints("total", totalArr, total);
+
+  function userLiftsPoints(name, arr, lift){
+
+    var i = d3.bisect(arr, parseInt(lift), 1);
+
+    content
+     .append('g')
+     .append('circle')
+     .attr("id", name + "Lift")
+     .style("fill", "yellow")
+     .attr("stroke", "black")
+     .attr("stroke-width", 1.5)
+     .attr('r', 5.5)
+     .style("opacity", 1)
+     .attr("cx", scaleX(100*((i) / (arr.length-1))))
+     .attr("cy", scaleY(lift));
+  }
+
+
+  var idleTimeout;
+
+  function idled() {
+    idleTimeout = null;
+  }
+
+  function updateChart() {
+      extent = d3.event.selection
+
+      if(!extent){
+        if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+        scaleX.domain([0,100])
+      }else{
+        scaleX.domain([scaleX.invert(extent[0]), scaleX.invert(extent[1])])
+        paths.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+      }
+
+      x_axis.transition().duration(1000).call(d3.axisBottom(scaleX))
+
+      updateLine(squatArr,    "#squat",    scaleX, scaleY);
+      updatePoint(squatArr,    "#squat",    scaleX, scaleY, squat);
+
+      updateLine(benchArr,    "#bench",    scaleX, scaleY);
+      updatePoint(benchArr,    "#bench",    scaleX, scaleY, bench);
+
+      updateLine(deadliftArr, "#deadlift", scaleX, scaleY);
+      updatePoint(deadliftArr,    "#deadlift",    scaleX, scaleY, deadlift);
+
+      updateLine(totalArr,    "#total",    scaleX, scaleY);
+      updatePoint(totalArr,    "#total",    scaleX, scaleY, total);
+    }
+}
+
+function updatePoint(arr, name, x, y, lift){
+
+  var i = d3.bisect(arr, parseInt(lift), 1);
+
+  d3.select(name + "Lift")
+  .attr("cx", x(100*((i) / (arr.length-1))))
+  .attr("cy", y(lift));
+}
+
+function updateLine(arr, name, x, y){
+  data = arr;
+  maxValue = data.length - 1;
+
+  var lineFunction = d3.line()
+    .x(function(d, i) { return x(100*((i) / (maxValue))) })
+    .y(function(d) { return y(d); });
+
+  d3.select(name).attr("d", lineFunction(data))
+}
+
+function drawLines(x, y){
+  drawLine(squatArr,    "squat",    x, y, "blue");
+  drawLine(benchArr,    "bench",    x, y, "red");
+  drawLine(deadliftArr, "deadlift", x, y, "green");
+  drawLine(totalArr,    "total",    x, y, "black");
+}
+
+function resetGraph(){
+  d3.select(".displayContext").html("");
 }
 
 
+function closest(arr, goal){
+  return arr.reduce(function(prev, curr) {
+    return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+  });
+}
+
 function drawLine(data, name, sx, sy, colour){
 
-  sortedData = data;
-
-  minValue = 0;
-  maxValue = sortedData.length-1;
-
-  console.log(minValue);
+  maxValue = data.length-1;
 
   var lineFunction = d3.line()
-    .x(function(d, i) { return sx(100*((i - minValue) / (maxValue - minValue))) })
-    .y(function(d) { return sy(d); })
-    .curve(d3.curveBasis);
+    .x(function(d, i) { return sx(100*(i / maxValue)) })
+    .y(function(d) { return sy(d); });
 
-    var lineGraph = content.append("path")
-    .attr("d", lineFunction(sortedData))
+    d3.select("#paths").append("path")
+    .attr("d", lineFunction(data))
     .transition()
     .ease(d3.easeSin)
     .duration(2500)
     .attr("stroke", colour)
     .attr("stroke-width", 2)
     .attr("fill", "none")
-    .attr("shape-rendering", "geometricPrecision");
-}
-
-function middleSort(data){
-
-  //https://stackoverflow.com/a/21911322/10757449
-  return data.sort(function(a, b) {
-      return a - b;
-  }).map(function(v, i, a) {
-      var p = ~~(a.length / 2);
-      return i >= p ? a[a.length - i + p - 1] : v;
-  });
-
+    .attr("shape-rendering", "geometricPrecision")
+    .attr("id", name);
 }

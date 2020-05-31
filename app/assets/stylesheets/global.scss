@@ -156,3 +156,18 @@ svg .rect {
   stroke: steelblue;
   stroke-width: 5px;
 }
+
+
+.zoom {
+  cursor: move;
+  fill: none;
+  pointer-events: all;
+}
+
+
+
+
+.area {
+  fill: steelblue;
+  clip-path: url(#clip);
+}
