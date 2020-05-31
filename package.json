@@ -2,14 +2,18 @@
   "name": "PowerPercentile",
   "private": true,
   "dependencies": {
-    "@rails/actioncable": "^6.0.0",
-    "@rails/activestorage": "^6.0.0",
-    "@rails/ujs": "^6.0.0",
-    "@rails/webpacker": "4.2.2",
-    "turbolinks": "^5.2.0"
+    "@rails/webpacker": "^3.5.5",
+    "awesomplete": "^1.1.2",
+    "bootstrap-sass": "",
+    "chromedriver": "^2.40.0",
+    "coffeescript": "1.12.7",
+    "jquery": "^3.2.1",
+    "node-sass": "^4.9.3",
+    "postcss-smart-import": "^0.7.6",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.22.1"
   },
-  "version": "0.1.0",
   "devDependencies": {
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^2.11.1"
   }
 }
