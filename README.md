@@ -1,24 +1,15 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+run: docker-compose build;
 
-Things you may want to cover:
 
-* Ruby version
+docker-compose run web rails db:create db:migrate db:schema:load db:seed;
 
-* System dependencies
 
-* Configuration
 
-* Database creation
+docker-compose up;
 
-* Database initialization
 
-* How to run the test suite
 
-* Services (job queues, cache servers, search engines, etc.)
 
-* Deployment instructions
-
-* ...
+visit: 0.0.0.0/5000
