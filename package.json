@@ -8,7 +8,7 @@
     "chromedriver": "^2.40.0",
     "coffeescript": "1.12.7",
     "jquery": "^3.2.1",
-    "node-sass": "^4.9.3",
+    "node-sass": "^7.0.0",
     "postcss-smart-import": "^0.7.6",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.22.1"
